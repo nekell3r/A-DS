@@ -1,0 +1,80 @@
+// Обратная Польская Запись (ПОЛИЗ / Postfix / RPN)
+// Формат: операнды перед оператором
+// Пример: "3 4 +" = 3 + 4 = 7
+// Пример: "5 1 2 + 4 * + 3 -" = 5 + (1+2)*4 - 3 = 14
+
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+#define MAX_STACK 100
+
+// Вычисление выражения в обратной польской записи
+int Poliz(char *expression) {
+    int stack[MAX_STACK];
+    int top = -1;
+
+    for (int i = 0; expression[i] != '\0'; i++) {
+        char symbol = expression[i];
+
+        // Если цифра - кладём в стек
+        if (isdigit(symbol)) {
+            int number = symbol - '0';
+            stack[++top] = number;
+        }
+        // Пробел - пропускаем
+        else if (symbol == ' ') {
+            continue;
+        }
+        // Оператор - достаём 2 числа, вычисляем, кладём результат
+        else {
+            int b = stack[top--];  // Второй операнд
+            int a = stack[top--];  // Первый операнд
+
+            int result;
+            if (symbol == '+') result = a + b;
+            else if (symbol == '-') result = a - b;
+            else if (symbol == '*') result = a * b;
+            else if (symbol == '/') result = a / b;
+
+            stack[++top] = result;
+        }
+    }
+    
+    return stack[top];
+}
+
+// ============ СЛОЖНОСТЬ ============
+// Время: O(n) - один проход по строке
+// Память: O(n) - в худшем случае весь стек заполнен
+
+// ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
+
+/*
+int main() {
+    printf("=== Обратная Польская Запись (Postfix) ===\n\n");
+    
+    // Тест 1: Простое сложение
+    char expr1[] = "3 4 +";
+    printf("Тест 1: \"%s\" = %d (ожидается 7)\n", expr1, Poliz(expr1));
+    
+    // Тест 2: Сложное выражение: 5 + (1+2)*4 - 3 = 14
+    char expr2[] = "5 1 2 + 4 * + 3 -";
+    printf("Тест 2: \"%s\" = %d (ожидается 14)\n", expr2, Poliz(expr2));
+    
+    // Тест 3: Умножение разности: (9-5)*2 = 8
+    char expr3[] = "9 5 - 2 *";
+    printf("Тест 3: \"%s\" = %d (ожидается 8)\n", expr3, Poliz(expr3));
+    
+    // Тест 4: Деление: 8/2 = 4
+    char expr4[] = "8 2 /";
+    printf("Тест 4: \"%s\" = %d (ожидается 4)\n", expr4, Poliz(expr4));
+    
+    // Тест 5: Только число
+    char expr5[] = "7";
+    printf("Тест 5: \"%s\" = %d (ожидается 7)\n", expr5, Poliz(expr5));
+    
+    return 0;
+}
+*/
+
