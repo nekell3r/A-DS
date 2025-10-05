@@ -1,70 +1,55 @@
+// Алгоритм Бойера-Мура (Boyer-Moore)
+// Поиск подстроки со сравнением справа налево
 #include <stdio.h>
 #include <string.h>
 
-int main()
-{
-    const int Nmax = 10000;
-    const int Mmax = 100;
+#define NO_OF_CHARS 256
+
+// Функция для заполнения таблицы плохих символов (bad character heuristic)
+void badCharHeuristic(char* pattern, int size, int badchar[NO_OF_CHARS]) {
+    // Инициализируем все значения как -1
+    for (int i = 0; i < NO_OF_CHARS; i++) {
+        badchar[i] = -1;
+    }
     
-    int i, j, k, i0, M, N;
+    // Заполняем фактические позиции символов в паттерне
+    for (int i = 0; i < size; i++) {
+        badchar[(int)pattern[i]] = i;
+    }
+}
+
+// Поиск всех вхождений pattern в text
+void boyerMooreSearch(char* text, char* pattern) {
+    int m = strlen(pattern);
+    int n = strlen(text);
     
-    char s[Nmax]; /* строка */
+    int badchar[NO_OF_CHARS];
     
-    char p[Mmax]; /* образец */
-    int d[256];
+    // Заполняем таблицу плохих символов
+    badCharHeuristic(pattern, m, badchar);
     
-    gets(s); /* Ввод текста, в котором будет осуществляться поиск */
-    N = strlen(s);
+    int s = 0;  // s - сдвиг паттерна относительно текста
     
-    while(1)
-    {
-        putchar(10);
-        printf(">_");
-        gets(p); /* Считывание образца */
-        M = strlen(p);
+    while (s <= (n - m)) {
+        int j = m - 1;
         
-        if(M == 0) /* Если образец пуст, поиск не выполняется */
-            return 0;
-        
-        /* Заполнение таблицы сдвигов d */
-        for(i = 0; i <= 255; i++)
-            d[i] = M; /* Пока все буквы в образце отсутствуют */
-        
-        for(j = 0; j <= M-2; j++)
-            d[(int)p[j]] = M-j-1; /*В массиве d остаётся самое правое (последнее) вхождение буквы в образец (ближайшее к концу при чтении слева направо)*/
-        
-        /* Поиск подстроки */
-        i = M;
-        i0 = 0;
-        do
-        {
-            putchar(10);
-            
-            if(i0 > 0)
-                for(k = 0; k < i0; k++)
-                    printf("_");
-            
-            while(i0 < 1)
-            {
-                printf("%c",s[i0]);
-                i0++;
-            }
-            
-            j = M;
-            k = i;
-            
-            do
-            {
-                k--;
-                j--;
-            }
-            while(!(j < 0 || (p[j] != s[k])));
-            
-            i = i + d[(int)s[i-1]];
+        // Сравниваем справа налево
+        while (j >= 0 && pattern[j] == text[s + j]) {
+            j--;
         }
-        while(!(j < 0 || i> N));
         
-        if(j<0) printf("!_Найден\n");
+        // Если паттерн найден
+        if (j < 0) {
+            printf("Найдено на позиции %d\n", s);
+            
+            // Сдвигаемся, используя таблицу плохих символов
+            s += (s + m < n) ? m - badchar[text[s + m]] : 1;
+        } else {
+            // Сдвигаем паттерн так, чтобы плохой символ в тексте
+            // совпал с последним его вхождением в паттерн
+            int shift = j - badchar[text[s + j]];
+            s += (shift > 1) ? shift : 1;
+        }
     }
 }
 
@@ -79,34 +64,50 @@ int main()
 // ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
 
 /*
-Алгоритм Бойера-Мура (Boyer-Moore)
-
-Идея: сравнение справа налево, большие сдвиги при несовпадении
-
-Пример поиска "EXAMPLE" в тексте:
-
-Таблица d для "EXAMPLE":
-  Все символы: 7 (длина образца)
-  E: 6 (последнее вхождение)
-  L: 2
-  P: 1
-  M: 3
-  A: 4
-  X: 5
-
-Преимущества:
-- Просматривает текст справа налево
-- Может пропускать большие куски текста
-- На практике быстрее КМП
-
-Тест 1: Найти "needle" в "haystack with needle inside"
-Результат: найдено на позиции 14
-
-Тест 2: Найти редкий паттерн
-"ZZZZZ" в "AAAABBBBCCCCDDDDZZZZZ"
-Результат: найдено на позиции 16 (быстро!)
-
-Тест 3: Английский текст
-Поиск слова очень быстр из-за больших сдвигов
+int main() {
+    printf("=== Алгоритм Бойера-Мура ===\n\n");
+    
+    // Тест 1: Простой поиск
+    char text1[] = "ABAAABCDABCDABDE";
+    char pattern1[] = "ABCD";
+    
+    printf("Тест 1: Ищем \"%s\" в \"%s\"\n", pattern1, text1);
+    boyerMooreSearch(text1, pattern1);
+    printf("\n");
+    
+    // Тест 2: Поиск в английском тексте
+    char text2[] = "haystack with needle inside haystack";
+    char pattern2[] = "needle";
+    
+    printf("Тест 2: Ищем \"%s\" в \"%s\"\n", pattern2, text2);
+    boyerMooreSearch(text2, pattern2);
+    printf("\n");
+    
+    // Тест 3: Повторяющийся паттерн
+    char text3[] = "AABAACAADAABAABA";
+    char pattern3[] = "AABA";
+    
+    printf("Тест 3: Ищем \"%s\" в \"%s\"\n", pattern3, text3);
+    boyerMooreSearch(text3, pattern3);
+    printf("\n");
+    
+    // Тест 4: Паттерн не найден
+    char text4[] = "abcdefghijk";
+    char pattern4[] = "xyz";
+    
+    printf("Тест 4: Ищем \"%s\" в \"%s\"\n", pattern4, text4);
+    boyerMooreSearch(text4, pattern4);
+    printf("(не найдено)\n\n");
+    
+    // Тест 5: Редкий символ (демонстрация скорости)
+    char text5[] = "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIZZZZZ";
+    char pattern5[] = "ZZZZ";
+    
+    printf("Тест 5: Ищем \"%s\" (редкий паттерн)\n", pattern5);
+    printf("В тексте: \"%s\"\n", text5);
+    boyerMooreSearch(text5, pattern5);
+    printf("(Быстро нашли благодаря большим сдвигам!)\n");
+    
+    return 0;
+}
 */
-
