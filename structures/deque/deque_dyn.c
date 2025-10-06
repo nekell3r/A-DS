@@ -6,9 +6,34 @@ typedef struct {
     int size;
 } vector;
 
-/* ===========================
-   Дек на двусвязном списке
-   =========================== */
+/* ============================================================
+   ШПАРГАЛКА: Дек на двусвязном списке (Deque)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       Item* left;   // левый конец дека
+       Item* right;  // правый конец дека
+       int size;     // размер дека
+   } deque;
+   
+   typedef struct Item {
+       int data;           // данные элемента
+       struct Item* next;  // следующий элемент
+       struct Item* prev;  // предыдущий элемент
+   } Item;
+   
+   ФУНКЦИИ:
+   deque* CreateDeque(vector* v)         vector → Deque
+   bool isEmptyDeque(deque* d)           Deque → boolean
+   bool PushLeftDeque(deque* d, int i)   Deque × int → Deque
+   bool PushRightDeque(deque* d, int i)  Deque × int → Deque
+   bool PopLeftDeque(deque* d)           Deque → Deque
+   bool PopRightDeque(deque* d)          Deque → Deque
+   int TopLeftDeque(deque* d)            Deque → int
+   int TopRightDeque(deque* d)           Deque → int
+   bool DeleteDeque(deque* d)            Deque → ∅
+   ============================================================ */
 
 typedef struct Item{
     int data;               // хранимое значение

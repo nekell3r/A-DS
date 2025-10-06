@@ -7,6 +7,46 @@
 
 typedef void* T;
 
+/* ============================================================
+   ШПАРГАЛКА: Список на векторе с пулом (List on Vector)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       Item* pool;    // массив элементов (пул)
+       int head;      // индекс терминатора
+       int top;       // индекс первого свободного элемента
+       int size;      // количество элементов
+       int capacity;  // размер пула
+   } List;
+   
+   typedef struct {
+       T data;      // данные
+       int next;    // индекс следующего (-1 если нет)
+       int prev;    // индекс предыдущего (-1 если нет)
+   } Item;
+   
+   typedef struct {
+       int index;   // индекс в массиве
+   } Iterator;
+   
+   ФУНКЦИИ:
+   void Create(List* l)                       ∅ → List
+   void Destroy(List* l)                      List → ∅
+   bool Empty(const List* l)                  List → boolean
+   int Size(const List* l)                    List → N
+   Iterator First(const List* l)              List → Iterator
+   Iterator Last(const List* l)               List → Iterator
+   Iterator Next(const List* l, Iterator it)  List × Iter → Iter
+   Iterator Prev(const List* l, Iterator it)  List × Iter → Iter
+   bool Equal(Iterator a, Iterator b)         Iter × Iter → boolean
+   bool NotEqual(Iterator a, Iterator b)      Iter × Iter → boolean
+   T Fetch(const List* l, Iterator it)        List × Iter → T
+   void Store(List* l, Iterator it, T data)   List × Iter × T → ∅
+   Iterator Insert(List* l, Iterator i, T t)  List × Iter × T → Iter
+   Iterator Delete(List* l, Iterator i)       List × Iterator → Iterator
+   ============================================================ */
+
 // Узел списка (хранится в векторе)
 typedef struct {
     T data;

@@ -7,6 +7,43 @@
 // (кольцевой список) [Create/терминатор, First/Last, Equal/NotEqual, Next/Prev, Fetch/Store].
 typedef void* T;
 
+/* ============================================================
+   ШПАРГАЛКА: Двусвязный список с итераторами (List)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       Item* head;  // терминатор (sentinel)
+       int size;    // размер списка
+   } List;
+   
+   typedef struct Item {
+       struct Item* prev;  // предыдущий элемент
+       struct Item* next;  // следующий элемент
+       T data;             // данные
+   } Item;
+   
+   typedef struct {
+       Item* node;  // указатель на узел
+   } Iterator;
+   
+   ФУНКЦИИ:
+   void Create(List* l)                                ∅ → List
+   void Destroy(List* l)                               List → ∅
+   bool Empty(const List* l)                           List → boolean
+   int Size(const List* l)                             List → N
+   Iterator First(const List* l)                       List → Iterator
+   Iterator Last(const List* l)                        List → Iterator
+   bool Equal(const Iterator* a, const Iterator* b)    Iter × Iter → boolean
+   bool NotEqual(const Iterator* a, const Iterator* b) Iter × Iter → boolean
+   Iterator Next(Iterator it)                          Iterator → Iterator
+   Iterator Prev(Iterator it)                          Iterator → Iterator
+   T Fetch(const Iterator* it)                         Iterator → T
+   void Store(const Iterator* it, const T t)           Iterator × T → ∅
+   Iterator Insert(List* l, Iterator* i, const T t)    List × Iter × T → Iter
+   Iterator Delete(List* l, Iterator* i)               List × Iterator → Iterator
+   ============================================================ */
+
 typedef struct Item {
     struct Item* prev;
     struct Item* next;

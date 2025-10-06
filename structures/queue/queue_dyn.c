@@ -3,9 +3,31 @@
 
 typedef void* T;
 
-/* ===========================
-   Очередь на динамических структурах
-   =========================== */
+/* ============================================================
+   ШПАРГАЛКА: Очередь на динамическом списке (Queue)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       QNode* head;  // терминатор (голова)
+       QNode* tail;  // последний элемент (хвост)
+       int size;     // размер очереди
+   } QueueDynamic;
+   
+   typedef struct QNode {
+       T data;              // данные элемента
+       struct QNode* next;  // следующий элемент
+   } QNode;
+   
+   ФУНКЦИИ:
+   void QD_Create(QueueDynamic* q)      ∅ → Queue
+   bool QD_Empty(const QueueDynamic* q) Queue → boolean
+   int QD_Size(const QueueDynamic* q)   Queue → N
+   bool QD_Push(QueueDynamic* q, T t)   Queue × T → Queue
+   T QD_Top(const QueueDynamic* q)      Queue → T
+   bool QD_Pop(QueueDynamic* q)         Queue → Queue
+   void QD_Destroy(QueueDynamic* q)     Queue → ∅
+   ============================================================ */
 
 typedef struct QNode {
     T               data;
@@ -23,27 +45,6 @@ void QD_Create(QueueDynamic* q) {
     q->size = 0;
 }
 
-void QD_Destroy(QueueDynamic* q) {
-    while (!QD_Empty(q)) {
-        QNode* pi = q->head;
-        q->head = q->head->next;
-        free(pi);
-    }
-    free(q->head);
-    q->head = q->tail = 0;
-    q->size = 0;
-}
-void QD_Destroy_Rec(QueueDynamic* q) {
-    q->tail->next = 0; // защита от мусорного next в терминаторе при пуше
-    QNode* pi = q->head;
-    q->head = q->head->next;
-    free(pi);
-    if (q->head) {
-        QD_Destroy_Rec(q);
-    }
-    q->tail = 0;
-    q->size = 0;
-}
 bool QD_Empty(const QueueDynamic* q) { return q->size == 0;  } // или return q->head == q->tail
 int  QD_Size (const QueueDynamic* q) { return q->size; }
 
@@ -59,7 +60,7 @@ bool QD_Push(QueueDynamic* q, T t) {
 
 T QD_Top(const QueueDynamic* q) {
     if (q->size != 0) {
-        return q->head->next->data;
+        return q->head->data;
     }
     return 0;
 }
@@ -71,6 +72,17 @@ bool QD_Pop(QueueDynamic* q) {
     free(first);
     q->size--;
     return true;
+}
+
+void QD_Destroy(QueueDynamic* q) {
+    while (!QD_Empty(q)) {
+        QNode* pi = q->head;
+        q->head = q->head->next;
+        free(pi);
+    }
+    free(q->head);
+    q->head = q->tail = 0;
+    q->size = 0;
 }
 
 // ============ СЛОЖНОСТЬ ============

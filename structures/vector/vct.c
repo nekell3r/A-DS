@@ -3,9 +3,26 @@
 
 typedef void* T;
 
-/* ===========================
-   Динамический вектор
-   =========================== */
+/* ============================================================
+   ШПАРГАЛКА: Динамический вектор (Vector)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       T* data;     // массив элементов
+       int size;    // размер вектора
+   } Vector;
+   
+   ФУНКЦИИ:
+   void Create(Vector* v, int sz)           N → V_T,In
+   bool Empty(Vector* v)                    V_T,In → boolean
+   int Size(Vector* v)                      V_T,In → N
+   T Load(Vector* v, int i)                 V_T,In × In → T
+   void Save(Vector* v, int i, T t)         V_T,In × In × T → V_T,In
+   void Resize(Vector* v, int sz)           V_T,In × N → V_T,Im
+   bool Equal(Vector* l, Vector* r)         V_T,In × V_T,In → boolean
+   void Destroy(Vector* v)                  V_T,In → ∅
+   ============================================================ */
 
 typedef struct
 {

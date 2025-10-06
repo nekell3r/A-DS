@@ -3,9 +3,30 @@
 
 typedef void* T;
 
-/* ===========================
-   Стек на динамическом списке
-   =========================== */
+/* ============================================================
+   ШПАРГАЛКА: Стек на динамическом списке (Stack)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       struct Item* top;  // вершина стека
+       int size;          // размер стека
+   } stack;
+   
+   struct Item {
+       T data;            // данные элемента
+       struct Item* prev; // предыдущий элемент
+   };
+   
+   ФУНКЦИИ:
+   void Create(stack* s)           ∅ → Stack
+   bool Empty(stack* s)            Stack → boolean
+   int Size(stack* s)              Stack → N
+   bool Push(stack* s, T t)        Stack × T → Stack
+   bool Pop(stack* s)              Stack → Stack
+   T Top(stack* s)                 Stack → T
+   void Destroy(stack* s)          Stack → ∅
+   ============================================================ */
 
 struct Item
 {
@@ -27,7 +48,7 @@ void Create(stack* s)
 
 bool Empty(stack* s)
 {
-    return s->top == 0;
+    return s->size == 0;
 }
 
 int Size(stack* s)

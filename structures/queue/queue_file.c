@@ -9,6 +9,28 @@
 #define POOL_SIZE 1024
 #define QUEUE_EMPTY -1
 
+/* ============================================================
+   ШПАРГАЛКА: Очередь на файле (File Queue)
+   ============================================================
+   
+   СТРУКТУРА:
+   typedef struct {
+       FILE* buff;  // файловый буфер
+       int size;    // количество элементов
+       int cap;     // вместимость (POOL_SIZE)
+       int head;    // индекс головы
+   } Queue;
+   
+   ФУНКЦИИ:
+   void init(Queue* q, const char* filename)  ∅ → Queue
+   bool isEmpty(Queue* q)                     Queue → boolean
+   int size(Queue* q)                         Queue → N
+   bool push(Queue* q, int val)               Queue × int → Queue
+   int top(Queue* q)                          Queue → int
+   bool pop(Queue* q, int* out)               Queue × int* → Queue
+   void destroy(Queue* q)                     Queue → ∅
+   ============================================================ */
+
 typedef struct Queue {
     FILE* buff;  // Файловый буфер для хранения данных
     int size;    // Текущее количество элементов
