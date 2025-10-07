@@ -49,10 +49,10 @@ bool QD_Empty(const QueueDynamic* q) { return q->size == 0;  } // или return 
 int  QD_Size (const QueueDynamic* q) { return q->size; }
 
 bool QD_Push(QueueDynamic* q, T t) {
-    QNode* n = (QNode*)malloc(sizeof(QNode));
+    QNode* n = malloc(sizeof(QNode));
     if (!n) return false;
     q->tail->next = n;
-    q->tail->data = t;
+    q->tail->data = t; // в последний узел записываем данные, а созданный становится терминатором
     q->tail = q->tail->next;
     q->size++;
     return true;

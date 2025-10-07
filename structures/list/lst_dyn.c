@@ -87,19 +87,6 @@ void Create(List* l) {
     l->size = 0;
 }
 
-// Уничтожение: последовательный обход и free всех элементов, затем free(head). 
-void Destroy(List* l) {
-    struct Item* i = l->head->next;
-    while (i != l->head) {
-        struct Item* pi = i; // почему struct`?
-        i = i->next;
-        free(pi);
-    }
-    free(l->head);
-    l->head = 0
-    l->size = 0;
-}
-
 // Пуст ли список (First == Last). 
 bool Empty(const List* l) {
     Iterator fst = First(l), lst = Last(l);
@@ -142,6 +129,20 @@ Iterator Delete(List* l, Iterator* i) {
     i->node = 0;
     return res;
 }
+
+// Уничтожение: последовательный обход и free всех элементов, затем free(head). 
+void Destroy(List* l) {
+    struct Item* i = l->head->next;
+    while (i != l->head) {
+        struct Item* pi = i; // почему struct`?
+        i = i->next;
+        free(pi);
+    }
+    free(l->head);
+    l->head = 0
+    l->size = 0;
+}
+
 
 // ============ СЛОЖНОСТЬ ============
 // Create: O(1) - создание терминатора
