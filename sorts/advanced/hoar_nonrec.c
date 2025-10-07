@@ -1,108 +1,156 @@
-// Обмен двух элементов местами
-void swap(int *n, int *m) {
-    int a = *n;
-    *n = *m;
-    *m = a;
+/*
+ * БЫСТРАЯ СОРТИРОВКА ХОАРА (НЕРЕКУРСИВНАЯ ВЕРСИЯ)
+ * =============================================
+ * 
+ * ИДЕЯ:
+ * Та же быстрая сортировка, но без рекурсии:
+ * 1. Используем стек для хранения границ подмассивов
+ * 2. Пока стек не пуст:
+ *    - Достаём границы очередного подмассива
+ *    - Разделяем его (partition)
+ *    - Кладём в стек границы получившихся частей
+ * 
+ * КАК ПИСАТЬ:
+ * 1. Создаём структуру для стека:
+ *    - Массив для хранения пар границ (left, right)
+ *    - Функции push() и pop()
+ * 
+ * 2. Основной цикл:
+ *    while(стек не пуст) {
+ *        - Берём границы из стека
+ *        - Разделяем массив
+ *        - Добавляем новые границы в стек
+ *    }
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Структура для хранения границ подмассива
+typedef struct {
+    int left;
+    int right;
+} Range;
+
+// Структура стека
+typedef struct {
+    Range* data;
+    int top;
+    int capacity;
+} Stack;
+
+// Создание стека
+Stack* createStack(int capacity) {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    stack->data = (Range*)malloc(capacity * sizeof(Range));
+    stack->top = -1;
+    stack->capacity = capacity;
+    return stack;
 }
 
-// Разделение массива на две части относительно опорного элемента
-// Возвращает позицию разделения
-int part(vectorint *a, int l, int r) {
-    // Выбираем опорный элемент (средний элемент диапазона)
-    int el = *vectorint_at(a, (l + r) / 2);
-    
-    // Пока указатели не встретились
-    while (l < r) {
-        // Двигаем левый указатель вправо, пока элементы меньше опорного
-        while (*vectorint_at(a, l) < el) {l++;}
-        
-        // Двигаем правый указатель влево, пока элементы больше опорного
-        while (*vectorint_at(a, r) > el) {r--;}
-        
-        // Если указатели встретились или пересеклись - выходим
-        if (l >= r) {continue;}
-        
-        // Меняем элементы местами и сдвигаем оба указатели
-        swap(vectorint_at(a, l++), vectorint_at(a, r--));
+// Добавление элемента в стек
+void push(Stack* stack, int left, int right) {
+    if (stack->top < stack->capacity - 1) {
+        stack->top++;
+        stack->data[stack->top].left = left;
+        stack->data[stack->top].right = right;
     }
-    
-    // Возвращаем позицию разделения
+}
+
+// Извлечение элемента из стека
+Range pop(Stack* stack) {
+    Range r = {-1, -1};
+    if (stack->top >= 0) {
+        r = stack->data[stack->top];
+        stack->top--;
+    }
     return r;
 }
 
-// Нерекурсивная быстрая сортировка Хоара (итеративная версия)
-// Использует явный стек для хранения диапазонов
-void qsort(vectorint* a) {
-    // Создаём стек для хранения пар (левая граница, правая граница)
-    stack *st = stackk_create();
+// Проверка пустоты стека
+int isEmpty(Stack* stack) {
+    return stack->top < 0;
+}
+
+// Обмен элементов
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Разделение массива (как в рекурсивной версии)
+int partition(int arr[], int left, int right) {
+    int pivot = arr[(left + right) / 2];
     
-    int n = vectorint_size(a);
-    
-    // Помещаем в стек начальный диапазон [0, n-1] - весь массив
-    stack_push(st, pair_make(0, n - 1));
-    
-    // Пока стек не пуст
-    while (!stack_empty(st)) {
-        // Извлекаем диапазон из стека
-        pair *p = stack_top(st);
-        int l = pair_first(p), r = pair_second(p);
-        stack_pop(st);
+    while (left <= right) {
+        while (arr[left] < pivot) left++;
+        while (arr[right] > pivot) right--;
         
-        // Если диапазон пустой или из одного элемента - пропускаем
-        if (l >= r) {continue;}
-        
-        // Разделяем диапазон на две части
-        int m = part(a, l, r);
-        
-        // ОПТИМИЗАЦИЯ: кладём в стек сначала больший диапазон, потом меньший
-        // Это минимизирует максимальную глубину стека (экономит память)
-        if (m - l > r - m) {
-            // Левая часть больше правой
-            stack_push(st, pair_make(l, m - 1));      // Больший диапазон
-            stack_push(st, pair_make(m, r));          // Меньший (обработается первым)
-        } else {
-            // Правая часть больше левой или равны
-            stack_push(st, pair_make(m + 1, r));      // Больший диапазон
-            stack_push(st, pair_make(l, m));          // Меньший (обработается первым)
+        if (left <= right) {
+            swap(&arr[left], &arr[right]);
+            left++;
+            right--;
         }
     }
+    
+    return left;
+}
+
+// Нерекурсивная быстрая сортировка
+void quickSortNonRecursive(int arr[], int n) {
+    // Создаём стек для хранения границ подмассивов
+    Stack* stack = createStack(n);
+    
+    // Кладём в стек границы всего массива
+    push(stack, 0, n - 1);
+    
+    // Пока есть подмассивы для сортировки
+    while (!isEmpty(stack)) {
+        // Берём очередной диапазон
+        Range range = pop(stack);
+        int left = range.left;
+        int right = range.right;
+        
+        // Если диапазон корректный
+        if (left < right) {
+            // Разделяем массив
+            int pivot = partition(arr, left, right);
+            
+            // Добавляем в стек границы получившихся подмассивов
+            if (pivot - 1 > left) {
+                push(stack, left, pivot - 1);
+            }
+            if (right > pivot) {
+                push(stack, pivot, right);
+            }
+        }
+    }
+    
+    // Освобождаем память
+    free(stack->data);
+    free(stack);
 }
 
 // ============ СЛОЖНОСТЬ ============
 // Время: O(n log n) в среднем, O(n²) в худшем случае
-// Память: O(log n) - стек (оптимизирован для меньшего использования)
-
-// ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
+// Память: O(n) для стека
+// Преимущество перед рекурсией: контроль над использованием памяти
 
 /*
-#include <stdio.h>
-
 int main() {
-    int arr[] = {5, 2, 9, 1, 7, 6, 3};
-    int n = 7;
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr) / sizeof(arr[0]);
     
     printf("До сортировки: ");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
-    printf("\n");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
     
-    // Предполагается vectorint - замените на свою структуру
-    // qsort(vector);
+    quickSortNonRecursive(arr, n);
     
-    printf("После сортировки: ");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
-    printf("\n");
-    
-    // Тест 1: Один элемент
-    printf("Тест 1: [5] → [5]\n");
-    
-    // Тест 2: Много одинаковых
-    int arr2[] = {3, 3, 1, 3, 3};
-    printf("Тест 2: 3 3 1 3 3 → ");
-    // qsort(vector2);
-    printf("1 3 3 3 3\n");
-    
-    // Тест 3: Большой массив
-    printf("Тест 3: 100 элементов → отсортировано за O(n log n)\n");
+    printf("\nПосле сортировки: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
     
     return 0;
 }

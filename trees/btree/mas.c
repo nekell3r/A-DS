@@ -29,12 +29,42 @@ Tree* init() {
     return tree;
 }
 
+// Вспомогательная функция: копирует поддерево из src[src_idx] в dst[dst_idx]
+void copy_subtree(int* src, size_t src_capacity, int src_idx,
+                  int* dst, size_t dst_capacity, int dst_idx) {
+    // Если индекс выходит за границы или узел пустой - останавливаемся
+    if (src_idx >= (int)src_capacity || dst_idx >= (int)dst_capacity ||
+        src[src_idx] == EMPTY_NODE) {
+        return;
+    }
+    
+    // Копируем текущий узел
+    dst[dst_idx] = src[src_idx];
+    
+    // Рекурсивно копируем левое и правое поддеревья
+    copy_subtree(src, src_capacity, 2 * src_idx + 1,  // левый ребёнок в src
+                 dst, dst_capacity, 2 * dst_idx + 1);  // левый ребёнок в dst
+    copy_subtree(src, src_capacity, 2 * src_idx + 2,  // правый ребёнок в src
+                 dst, dst_capacity, 2 * dst_idx + 2);  // правый ребёнок в dst
+}
+
 // Построение дерева из корня и двух поддеревьев
 Tree* build(Tree* left, int root_value, Tree* right) {
     Tree* tree = init();
     tree->data[0] = root_value;
-    if (left != NULL && left->data[0] != EMPTY_NODE) tree->data[1] = left->data[0];
-    if (right != NULL && right->data[0] != EMPTY_NODE) tree->data[2] = right->data[0];
+    
+    // Копируем всё левое поддерево в позицию 1 (левый ребёнок корня)
+    if (left != NULL) {
+        copy_subtree(left->data, left->capacity, 0,
+                    tree->data, tree->capacity, 1);
+    }
+    
+    // Копируем всё правое поддерево в позицию 2 (правый ребёнок корня)
+    if (right != NULL) {
+        copy_subtree(right->data, right->capacity, 0,
+                    tree->data, tree->capacity, 2);
+    }
+    
     return tree;
 }
 
