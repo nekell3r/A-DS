@@ -1,4 +1,32 @@
 // Бинарное дерево на указателях (динамическое)
+//
+// ============ КРАТКАЯ СПРАВКА ============
+//
+// СТРУКТУРЫ:
+//   struct Tree_Node_ {
+//       int data;
+//       Tree_Node* left;
+//       Tree_Node* right;
+//   };
+//   struct Tree_ {
+//       Tree_Node* root;
+//   };
+//
+// ОСНОВНЫЕ ФУНКЦИИ:
+//   void init(Tree* tree)                           - инициализировать пустое дерево
+//   Tree* build(Tree* left, int value, Tree* right) - построить из поддеревьев
+//   Tree_Node* build_from_array(int** values, int n) - построить из массива
+//   bool is_empty(Tree* tree)                       - проверка пустоты
+//   int root_value(Tree* tree)                      - значение корня
+//   Tree* left_subtree(Tree* tree)                  - левое поддерево
+//   Tree* right_subtree(Tree* tree)                 - правое поддерево
+//   void destroy(Tree* tree)                        - удалить дерево
+//   void preorder(Tree_Node* node)                  - прямой обход
+//   void inorder(Tree_Node* node)                   - симметричный обход
+//   void postorder(Tree_Node* node)                 - обратный обход
+//
+// ==========================================
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -19,10 +47,8 @@ struct Tree_ {
 // ============ БАЗОВЫЕ ФУНКЦИИ ============
 
 // Инициализация пустого дерева
-Tree* init() {
-    Tree* tree = (Tree*)malloc(sizeof(Tree));
+void init(Tree* tree) {
     tree->root = NULL;
-    return tree;
 }
 
 // Построение дерева из корня и двух поддеревьев (без копирования)
@@ -62,12 +88,19 @@ Tree* right_subtree(Tree* tree) {
     return right_tree;
 }
 
-// Удаление дерева (можно использовать для узлов напрямую)
-void destroy(Tree_Node* node) {
+// Вспомогательная функция для удаления узлов
+void destroy_node(Tree_Node* node) {
     if (node == NULL) return;
-    destroy(node->left);
-    destroy(node->right);
+    destroy_node(node->left);
+    destroy_node(node->right);
     free(node);
+}
+
+// Удаление дерева
+void destroy(Tree* tree) {
+    if (tree == NULL) return;
+    destroy_node(tree->root);
+    free(tree);
 }
 
 // ============ ПОСТРОЕНИЕ ДЕРЕВА ИЗ МАССИВА ============
@@ -149,27 +182,19 @@ int main() {
     printf("In-order: "); inorder(root); printf("\n");      // 4 2 5 1 6 3 7
     printf("Post-order: "); postorder(root); printf("\n");  // 4 5 2 6 7 3 1
     
-    destroy(root);
+    destroy_node(root);  // Используем destroy_node для Tree_Node*
     
-    // Тест 2: Маленькое дерево
-    int vals2[] = {10, 20, 30};
-    int* ptr2 = vals2;
-    Tree_Node* root2 = build_from_array(&ptr2, 3);
+    // Тест 2: Построение через build()
+    Tree* tree = build(NULL, 42, NULL);
+    printf("\nТест 2: Дерево с одним узлом через build\n");
+    printf("Pre-order: "); preorder(tree->root); printf("\n");  // 42
+    destroy(tree);  // Используем destroy для Tree*
     
-    printf("\nТест 2: Дерево из 3 элементов\n");
-    printf("Pre-order: "); preorder(root2); printf("\n");   // 10 20 30
-    
-    destroy(root2);
-    
-    // Тест 3: Один узел
-    int vals3[] = {42};
-    int* ptr3 = vals3;
-    Tree_Node* root3 = build_from_array(&ptr3, 1);
-    
-    printf("\nТест 3: Дерево из 1 элемента\n");
-    printf("Pre-order: "); preorder(root3); printf("\n");   // 42
-    
-    destroy(root3);
+    // Тест 3: Инициализация и использование
+    Tree tree3;
+    init(&tree3);
+    printf("\nТест 3: Пустое дерево\n");
+    printf("Пустое? %s\n", is_empty(&tree3) ? "Да" : "Нет");  // Да
     
     return 0;
 }

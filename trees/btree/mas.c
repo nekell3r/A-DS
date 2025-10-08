@@ -3,6 +3,30 @@
 //   - левый ребёнок: 2*i + 1
 //   - правый ребёнок: 2*i + 2
 //   - родитель: (i-1) / 2
+//
+// ============ КРАТКАЯ СПРАВКА ============
+//
+// СТРУКТУРЫ:
+//   typedef struct {
+//       int* data;       - массив значений узлов
+//       size_t capacity; - ёмкость массива
+//   } Tree;
+//
+// ОСНОВНЫЕ ФУНКЦИИ:
+//   Tree* init()                                   - создать пустое дерево
+//   Tree* build(Tree* left, int value, Tree* right) - построить из поддеревьев
+//   Tree* build_from_array(int values[], int n)    - построить из массива
+//   bool is_empty(Tree* tree)                      - проверка пустоты
+//   int root(Tree* tree)                           - значение корня
+//   Tree* left(Tree* tree)                         - левое поддерево
+//   Tree* right(Tree* tree)                        - правое поддерево
+//   void destroy(Tree* tree)                       - удалить дерево
+//   void preorder(Tree* tree, int idx)             - прямой обход
+//   void inorder(Tree* tree, int idx)              - симметричный обход
+//   void postorder(Tree* tree, int idx)            - обратный обход
+//
+// ==========================================
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
