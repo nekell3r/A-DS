@@ -1,7 +1,7 @@
 // Прямая Польская Запись (Polish Notation / Prefix)
 // Формат: оператор перед операндами
 // Пример: "+ 3 4" = 3 + 4 = 7
-// Пример: "- + + 5 * + 1 2 4 3" = 5 + (1+2)*4 - 3 = 14
+// Пример: "- + 5 * + 1 2 4 3" = 5 + (1+2)*4 - 3 = 14
 //
 // ============ КРАТКАЯ СПРАВКА ============
 //
@@ -20,16 +20,32 @@
 // ==========================================
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 
 #define MAX_STACK 100
 
+// ============ СТЕК (импортированный интерфейс) ============
+
+typedef struct {
+    int data[MAX_STACK];
+    int top;
+} Stack;
+
+void Stack_Init(Stack *s);
+void Stack_Push(Stack *s, int value);
+int Stack_Pop(Stack *s);
+int Stack_IsEmpty(Stack *s);
+int Stack_Size(Stack *s);
+
+// ============ ОСНОВНАЯ ФУНКЦИЯ ============
+
 // Вычисление выражения в прямой польской записи
 // ГЛАВНОЕ ОТЛИЧИЕ: читаем строку СПРАВА НАЛЕВО!
 int PolPZ(char *expression) {
-    int stack[MAX_STACK];
-    int top = -1;
+    Stack stack;
+    Stack_Init(&stack);
     
     int len = strlen(expression);
     
@@ -37,32 +53,48 @@ int PolPZ(char *expression) {
     for (int i = len - 1; i >= 0; i--) {
         char symbol = expression[i];
 
-        // Если цифра - кладём в стек
-        if (isdigit(symbol)) {
-            int number = symbol - '0';
-            stack[++top] = number;
-        }
-        // Пробел - пропускаем
-        else if (symbol == ' ') {
+        // Пробелы и разделители - пропускаем
+        if (symbol == ' ' || symbol == '\t' || symbol == '\n') {
             continue;
+        }
+        // Если цифра - кладём в стек
+        else if (isdigit(symbol)) {
+            int number = symbol - '0';
+            Stack_Push(&stack, number);
         }
         // Оператор - достаём 2 числа, вычисляем, кладём результат
         // ВАЖНО: порядок операндов ОБРАТНЫЙ (сначала a, потом b)
         else {
-            int a = stack[top--];  // Первый операнд
-            int b = stack[top--];  // Второй операнд
+            int a = Stack_Pop(&stack);  // Первый операнд
+            int b = Stack_Pop(&stack);  // Второй операнд
 
             int result;
-            if (symbol == '+') result = a + b;
-            else if (symbol == '-') result = a - b;
-            else if (symbol == '*') result = a * b;
-            else if (symbol == '/') result = a / b;
+            if (symbol == '+') {
+                result = a + b;
+            }
+            else if (symbol == '-') {
+                result = a - b;
+            }
+            else if (symbol == '*') {
+                result = a * b;
+            }
+            else if (symbol == '/') {
+                if (b == 0) {
+                    printf("Ошибка: деление на ноль\n");
+                    exit(1);
+                }
+                result = a / b;
+            }
+            else {
+                printf("Ошибка: неизвестный оператор '%c'\n", symbol);
+                exit(1);
+            }
 
-            stack[++top] = result;
+            Stack_Push(&stack, result);
         }
     }
     
-    return stack[top];
+    return Stack_Pop(&stack);
 }
 
 // ============ СЛОЖНОСТЬ ============
@@ -80,7 +112,7 @@ int main() {
     printf("Тест 1: \"%s\" = %d (ожидается 7)\n", expr1, PolPZ(expr1));
     
     // Тест 2: Сложное выражение: 5 + (1+2)*4 - 3 = 14
-    char expr2[] = "- + + 5 * + 1 2 4 3";
+    char expr2[] = "- + 5 * + 1 2 4 3";
     printf("Тест 2: \"%s\" = %d (ожидается 14)\n", expr2, PolPZ(expr2));
     
     // Тест 3: Умножение разности: (9-5)*2 = 8
