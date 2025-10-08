@@ -13,7 +13,7 @@
 //   } Tree;
 //
 // ОСНОВНЫЕ ФУНКЦИИ:
-//   Tree* init()                                   - создать пустое дерево
+//   void init(Tree* tree)                          - инициализировать пустое дерево
 //   Tree* build(Tree* left, int value, Tree* right) - построить из поддеревьев
 //   Tree* build_from_array(int values[], int n)    - построить из массива
 //   bool is_empty(Tree* tree)                      - проверка пустоты
@@ -43,38 +43,19 @@ typedef struct {
 // ============ БАЗОВЫЕ ФУНКЦИИ ============
 
 // Инициализация пустого дерева
-Tree* init() {
-    Tree* tree = (Tree*)malloc(sizeof(Tree));
+void init(Tree* tree) {
     tree->capacity = DEFAULT_CAPACITY;
     tree->data = (int*)malloc(tree->capacity * sizeof(int));
     for (size_t i = 0; i < tree->capacity; i++) {
         tree->data[i] = EMPTY_NODE;
     }
-    return tree;
 }
 
-// Вспомогательная функция: копирует поддерево из src[src_idx] в dst[dst_idx]
-void copy_subtree(int* src, size_t src_capacity, int src_idx,
-                  int* dst, size_t dst_capacity, int dst_idx) {
-    // Если индекс выходит за границы или узел пустой - останавливаемся
-    if (src_idx >= (int)src_capacity || dst_idx >= (int)dst_capacity ||
-        src[src_idx] == EMPTY_NODE) {
-        return;
-    }
-    
-    // Копируем текущий узел
-    dst[dst_idx] = src[src_idx];
-    
-    // Рекурсивно копируем левое и правое поддеревья
-    copy_subtree(src, src_capacity, 2 * src_idx + 1,  // левый ребёнок в src
-                 dst, dst_capacity, 2 * dst_idx + 1);  // левый ребёнок в dst
-    copy_subtree(src, src_capacity, 2 * src_idx + 2,  // правый ребёнок в src
-                 dst, dst_capacity, 2 * dst_idx + 2);  // правый ребёнок в dst
-}
 
 // Построение дерева из корня и двух поддеревьев
 Tree* build(Tree* left, int root_value, Tree* right) {
-    Tree* tree = init();
+    Tree* tree = (Tree*)malloc(sizeof(Tree));
+    init(tree);
     tree->data[0] = root_value;
     
     // Копируем всё левое поддерево в позицию 1 (левый ребёнок корня)
@@ -103,19 +84,50 @@ int root(Tree* tree) {
     return tree->data[0];
 }
 
-// Получение левого поддерева
+// Вспомогательная функция: копирует поддерево из src[src_idx] в dst[dst_idx]
+void copy_subtree(int* src, size_t src_capacity, int src_idx,
+    int* dst, size_t dst_capacity, int dst_idx) {
+    // Если индекс выходит за границы или узел пустой - останавливаемся
+    if (src_idx >= (int)src_capacity || dst_idx >= (int)dst_capacity ||
+        src[src_idx] == EMPTY_NODE) {
+        return;
+    }
+
+    // Копируем текущий узел
+    dst[dst_idx] = src[src_idx];
+
+    // Рекурсивно копируем левое и правое поддеревья
+    copy_subtree(src, src_capacity, 2 * src_idx + 1,  // левый ребёнок в src
+                dst, dst_capacity, 2 * dst_idx + 1);  // левый ребёнок в dst
+    copy_subtree(src, src_capacity, 2 * src_idx + 2,  // правый ребёнок в src
+                dst, dst_capacity, 2 * dst_idx + 2);  // правый ребёнок в dst
+}
+
+// Получение левого поддерева (глубокая копия всего поддерева)
 Tree* left(Tree* tree) {
     if (is_empty(tree) || tree->data[1] == EMPTY_NODE) return NULL;
-    Tree* left_tree = init();
-    left_tree->data[0] = tree->data[1];
+    
+    Tree* left_tree = (Tree*)malloc(sizeof(Tree));
+    init(left_tree);
+    
+    // Копируем ВСЁ левое поддерево с корнем в индексе 1 -> в индекс 0
+    copy_subtree(tree->data, tree->capacity, 1,
+                 left_tree->data, left_tree->capacity, 0);
+    
     return left_tree;
 }
 
-// Получение правого поддерева
+// Получение правого поддерева (глубокая копия всего поддерева)
 Tree* right(Tree* tree) {
     if (is_empty(tree) || tree->data[2] == EMPTY_NODE) return NULL;
-    Tree* right_tree = init();
-    right_tree->data[0] = tree->data[2];
+    
+    Tree* right_tree = (Tree*)malloc(sizeof(Tree));
+    init(right_tree);
+    
+    // Копируем ВСЁ правое поддерево с корнем в индексе 2 -> в индекс 0
+    copy_subtree(tree->data, tree->capacity, 2,
+                 right_tree->data, right_tree->capacity, 0);
+    
     return right_tree;
 }
 
@@ -130,7 +142,8 @@ void destroy(Tree* tree) {
 
 // Построение дерева из массива
 Tree* build_from_array(int values[], int n) {
-    Tree* tree = init();
+    Tree* tree = (Tree*)malloc(sizeof(Tree));
+    init(tree);
     for (int i = 0; i < n && i < (int)tree->capacity; i++) {
         tree->data[i] = values[i];
     }
@@ -163,19 +176,22 @@ void postorder(Tree* tree, int idx) {
     printf("%d ", tree->data[idx]);
 }
 
-// ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
-
 // ============ СЛОЖНОСТЬ ============
+// init: O(capacity) - заполнение массива
+// build: O(n) - копирование поддеревьев
 // build_from_array: O(n) - копирование n элементов
+// left/right: O(n) - глубокая копия поддерева
 // preorder/inorder/postorder: O(n) - посещаем каждый узел
 // destroy: O(1) - просто освобождаем массив
-// Память: O(n) - массив фиксированного размера
+// Память: O(capacity) - массив фиксированного размера
+
+// ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
 
 /*
 int main() {
     printf("=== Бинарное дерево (массив) ===\n\n");
     
-    // Тест 1: Полное дерево
+    // Тест 1: Построение из массива
     int values[] = {1, 2, 3, 4, 5, 6, 7};
     Tree* tree = build_from_array(values, 7);
     
@@ -191,25 +207,31 @@ int main() {
     printf("In-order: "); inorder(tree, 0); printf("\n");     // 4 2 5 1 6 3 7
     printf("Post-order: "); postorder(tree, 0); printf("\n"); // 4 5 2 6 7 3 1
     
+    // Тест 2: Получение поддеревьев
+    Tree* left_subtree = left(tree);
+    Tree* right_subtree = right(tree);
+    
+    printf("\nТест 2: Левое поддерево (корень 2)\n");
+    printf("Pre-order: "); preorder(left_subtree, 0); printf("\n");  // 2 4 5
+    
+    printf("\nТест 3: Правое поддерево (корень 3)\n");
+    printf("Pre-order: "); preorder(right_subtree, 0); printf("\n"); // 3 6 7
+    
+    // Тест 4: Построение через build
+    Tree* t1 = build_from_array((int[]){2, 4, 5}, 3);
+    Tree* t2 = build_from_array((int[]){3, 6, 7}, 3);
+    Tree* t3 = build(t1, 1, t2);
+    
+    printf("\nТест 4: Построение через build\n");
+    printf("Pre-order: "); preorder(t3, 0); printf("\n");  // 1 2 4 5 3 6 7
+    
+    // Очистка
     destroy(tree);
-    
-    // Тест 2: Неполное дерево (с пробелами)
-    int vals2[] = {10, 20, 30, EMPTY_NODE, EMPTY_NODE, 60, 70};
-    Tree* tree2 = build_from_array(vals2, 7);
-    
-    printf("\nТест 2: Неполное дерево\n");
-    printf("Pre-order: "); preorder(tree2, 0); printf("\n");  // 10 20 30 60 70
-    
-    destroy(tree2);
-    
-    // Тест 3: Только корень
-    int vals3[] = {100};
-    Tree* tree3 = build_from_array(vals3, 1);
-    
-    printf("\nТест 3: Один узел\n");
-    printf("Pre-order: "); preorder(tree3, 0); printf("\n");  // 100
-    
-    destroy(tree3);
+    destroy(left_subtree);
+    destroy(right_subtree);
+    destroy(t1);
+    destroy(t2);
+    destroy(t3);
     
     return 0;
 }
