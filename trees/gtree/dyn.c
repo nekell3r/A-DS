@@ -9,21 +9,20 @@
 //       node* main_bro;     - следующий брат (next sibling)
 //       node* first_child;  - первый ребёнок
 //   };
-//   typedef node* tree_ov;
 //
 // ОСНОВНЫЕ ФУНКЦИИ:
-//   void init(tree_ov* tree, int root_value)         - инициализировать дерево с корнем
-//   node* create_node(int value)                     - создать узел
-//   tree_ov build(int value, tree_ov* children, int count) - построить из массива детей
-//   tree_ov build_from_array(int values[], int n)    - построить из массива (1 уровень)
-//   bool is_empty(tree_ov tree)                      - проверка пустоты
-//   int root_value(tree_ov tree)                     - значение корня
-//   tree_ov first_child(tree_ov tree)                - первый ребёнок
-//   tree_ov next_sibling(tree_ov tree)               - следующий брат
-//   tree_ov* get_node(tree_ov* t, char* path)        - получить узел по пути ('c'/'b')
-//   void destroy(tree_ov tree)                       - удалить дерево
-//   void preorder(tree_ov tree)                      - прямой обход (корень->дети->братья)
-//   void postorder(tree_ov tree)                     - обратный обход (дети->корень->братья)
+//   void init(node** tree, int root_value)         - инициализировать дерево с корнем
+//   node* create_node(int value)                   - создать узел
+//   node* build(int value, node** children, int count) - построить из массива детей
+//   node* build_from_array(int values[], int n)    - построить из массива (1 уровень)
+//   bool is_empty(node* tree)                      - проверка пустоты
+//   int root_value(node* tree)                     - значение корня
+//   node* first_child(node* tree)                  - первый ребёнок
+//   node* next_sibling(node* tree)                 - следующий брат
+//   node** get_node(node** t, char* path)          - получить узел по пути ('c'/'b')
+//   void destroy(node* tree)                       - удалить дерево
+//   void preorder(node* tree)                      - прямой обход (корень->дети->братья)
+//   void postorder(node* tree)                     - обратный обход (дети->корень->братья)
 //
 // ==========================================
 
@@ -33,7 +32,6 @@
 #include <string.h>
 
 typedef struct node node;
-typedef node* tree_ov;
 
 // Структура узла общего дерева
 struct node {
@@ -45,7 +43,7 @@ struct node {
 // ============ БАЗОВЫЕ ФУНКЦИИ ============
 
 // Инициализация дерева с корнем (деревья общего вида не бывают пустые)
-void init(tree_ov* tree, int root_value) {
+void init(node** tree, int root_value) {
     *tree = (node*)malloc(sizeof(node));
     (*tree)->val = root_value;
     (*tree)->first_child = NULL;
@@ -62,8 +60,8 @@ node* create_node(int value) {
 }
 
 // Построение дерева из корня и массива детей
-tree_ov build(int root_value, tree_ov* children, int count) {
-    tree_ov root = create_node(root_value);
+node* build(int root_value, node** children, int count) {
+    node* root = create_node(root_value);
     if (count == 0 || children == NULL) return root;
     
     root->first_child = children[0];
@@ -76,24 +74,24 @@ tree_ov build(int root_value, tree_ov* children, int count) {
 }
 
 // Проверка пустоты дерева
-bool is_empty(tree_ov tree) {
+bool is_empty(node* tree) {
     return tree == NULL;
 }
 
 // Получение значения корня
-int root_value(tree_ov tree) {
+int root_value(node* tree) {
     if (is_empty(tree)) return -1;
     return tree->val;
 }
 
 // Получение первого ребёнка
-tree_ov first_child(tree_ov tree) {
+node* first_child(node* tree) {
     if (is_empty(tree)) return NULL;
     return tree->first_child;
 }
 
 // Получение следующего брата
-tree_ov next_sibling(tree_ov tree) {
+node* next_sibling(node* tree) {
     if (is_empty(tree)) return NULL;
     return tree->main_bro;
 }
@@ -101,7 +99,7 @@ tree_ov next_sibling(tree_ov tree) {
 // Получение узла по пути
 // path - строка из символов 'c' (first_child) и 'b' (main_bro)
 // Пример: "cb" - первый ребёнок, затем его следующий брат
-static tree_ov* get_node(tree_ov* t, char* path) {
+static node** get_node(node** t, char* path) {
     if (path[0] == '\0') {
         return t;
     } else if (path[0] == 'c' && (*t)->first_child != NULL) {
@@ -114,11 +112,10 @@ static tree_ov* get_node(tree_ov* t, char* path) {
 }
 
 // Удаление дерева
-// Примечание: tree_ov = node*, поэтому рекурсивные вызовы корректны
-void destroy(tree_ov tree) {
+void destroy(node* tree) {
     if (tree == NULL) return;
-    destroy(tree->first_child);  // tree->first_child это node* = tree_ov
-    destroy(tree->main_bro);     // tree->main_bro это node* = tree_ov
+    destroy(tree->first_child);  // Рекурсивно удаляем детей
+    destroy(tree->main_bro);     // Рекурсивно удаляем братьев
     free(tree);
 }
 
@@ -126,10 +123,10 @@ void destroy(tree_ov tree) {
 
 // Построение дерева из массива (первый элемент - корень, остальные - дети)
 // Простой вариант: одноуровневое дерево
-tree_ov build_from_array(int values[], int n) {
+node* build_from_array(int values[], int n) {
     if (n <= 0) return NULL;
     
-    tree_ov root = create_node(values[0]);
+    node* root = create_node(values[0]);
     if (n == 1) return root;
     
     root->first_child = create_node(values[1]);
@@ -147,7 +144,7 @@ tree_ov build_from_array(int values[], int n) {
 
 // Обход в глубину (pre-order): корень -> дети -> братья
 // Сначала перебираются сыновья (аналогичен КЛП обходу)
-void preorder(tree_ov tree) {
+void preorder(node* tree) {
     if (tree == NULL) return;
     printf("%d ", tree->val);           // Берется корень
     preorder(tree->first_child);        // Поиск в глубину от first_child
@@ -155,7 +152,7 @@ void preorder(tree_ov tree) {
 }
 
 // Обход в глубину (post-order): дети -> корень -> братья
-void postorder(tree_ov tree) {
+void postorder(node* tree) {
     if (tree == NULL) return;
     postorder(tree->first_child);       // Сначала дети
     printf("%d ", tree->val);           // Потом корень
@@ -176,13 +173,13 @@ int main() {
     printf("=== Общее дерево (first child / next sibling) ===\n\n");
     
     // Тест 1: Инициализация с корнем
-    tree_ov tree1;
+    node* tree1;
     init(&tree1, 1);
     printf("Тест 1: Дерево с корнем\n");
     printf("Корень: %d\n", root_value(tree1));  // 1
     
     // Тест 2: Построение из массива
-    tree_ov tree = build_from_array((int[]){1, 2, 3, 4, 5}, 5);
+    node* tree = build_from_array((int[]){1, 2, 3, 4, 5}, 5);
     
     // Структура:
     //       1
@@ -194,28 +191,28 @@ int main() {
     printf("Post-order: "); postorder(tree); printf("\n"); // 2 3 4 5 1
     
     // Тест 3: Построение вручную (многоуровневое) как на фото
-    tree_ov leaf8 = create_node(8);
-    tree_ov leaf9 = create_node(9);
+    node* leaf8 = create_node(8);
+    node* leaf9 = create_node(9);
     leaf8->first_child = leaf9;
     
-    tree_ov node3 = create_node(3);
+    node* node3 = create_node(3);
     node3->first_child = leaf8;
     
-    tree_ov node6 = create_node(6);
-    tree_ov node7 = create_node(7);
+    node* node6 = create_node(6);
+    node* node7 = create_node(7);
     node6->main_bro = node7;
     
-    tree_ov node5 = create_node(5);
+    node* node5 = create_node(5);
     node5->first_child = node6;
     
-    tree_ov node4 = create_node(4);
+    node* node4 = create_node(4);
     node4->main_bro = node5;
     node3->main_bro = node4;
     
-    tree_ov node2 = create_node(2);
+    node* node2 = create_node(2);
     node2->main_bro = node3;
     
-    tree_ov root = create_node(1);
+    node* root = create_node(1);
     root->first_child = node2;
     
     // Структура (как на фото):
@@ -233,7 +230,7 @@ int main() {
     
     // Тест 4: Получение узла по пути
     printf("\nТест 4: Получение узла по пути\n");
-    tree_ov* found = get_node(&root, "c");     // первый ребёнок (2)
+    node** found = get_node(&root, "c");     // первый ребёнок (2)
     if (found) printf("Путь 'c': %d\n", (*found)->val);
     
     found = get_node(&root, "cb");             // первый ребёнок, затем брат (3)

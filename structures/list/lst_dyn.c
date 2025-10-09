@@ -89,8 +89,7 @@ void Create(List* l) {
 
 // Пуст ли список (First == Last). 
 bool Empty(const List* l) {
-    Iterator fst = First(l), lst = Last(l);
-    return fst.node == lst.node;
+    return l->size == 0;
 }
 
 // Размер (поддерживается счётчиком). 

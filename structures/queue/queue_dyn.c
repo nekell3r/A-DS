@@ -35,8 +35,8 @@ typedef struct QNode {
 } QNode;
 
 typedef struct {
-    QNode* head;  // терминатор
-    QNode* tail;  // последний элемент
+    QNode* head;  // первый элемент
+    QNode* tail;  // терминатор
     int    size;
 } QueueDynamic;
 

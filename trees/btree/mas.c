@@ -138,18 +138,6 @@ void destroy(Tree* tree) {
     free(tree);
 }
 
-// ============ ПОСТРОЕНИЕ ДЕРЕВА ИЗ МАССИВА ============
-
-// Построение дерева из массива
-Tree* build_from_array(int values[], int n) {
-    Tree* tree = (Tree*)malloc(sizeof(Tree));
-    init(tree);
-    for (int i = 0; i < n && i < (int)tree->capacity; i++) {
-        tree->data[i] = values[i];
-    }
-    return tree;
-}
-
 // ============ АЛГОРИТМЫ ОБХОДА ============
 
 // Прямой обход (pre-order): корень -> левый -> правый
