@@ -9,11 +9,11 @@
 void rabinKarp(char* text, char* pattern) {
     int M = strlen(pattern);
     int N = strlen(text);
-    long long q = 101;  // Простое число для модуля
+    int q = 101;  // Простое число для модуля
     
-    long long h = 1;  // h = d^(M-1) % q
-    long long p = 0;  // Хэш паттерна
-    long long t = 0;  // Хэш текущего окна текста
+    int h = 1;  // h = d^(M-1) % q
+    int p = 0;  // Хэш паттерна
+    int t = 0;  // Хэш текущего окна текста
     
     // Вычисляем h = d^(M-1) % q
     for (int i = 0; i < M - 1; i++) {

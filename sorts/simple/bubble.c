@@ -17,25 +17,6 @@ void bubbleSort(int arr[], int size) {
     }
 }
 
-// Оптимизированная версия с флагом (останавливается если массив отсортирован)
-void bubbleSortOptimized(int arr[], int size) {
-    for (int i = 0; i < size - 1; i++) {
-        int swapped = 0;  // Флаг обменов
-        
-        for (int j = 0; j < size - 1 - i; j++) {
-            if (arr[j] > arr[j + 1]) {
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-                swapped = 1;
-            }
-        }
-        
-        // Если не было обменов - массив отсортирован
-        if (!swapped) break;
-    }
-}
-
 // ============ СЛОЖНОСТЬ ============
 // Время: O(n²) в худшем и среднем случае
 //        O(n) в лучшем случае (уже отсортирован) - для оптимизированной версии

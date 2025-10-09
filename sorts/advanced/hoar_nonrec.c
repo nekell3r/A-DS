@@ -11,9 +11,9 @@
  *    - Кладём в стек границы получившихся частей
  * 
  * КАК ПИСАТЬ:
- * 1. Создаём структуру для стека:
- *    - Массив для хранения пар границ (left, right)
- *    - Функции push() и pop()
+ * 1. Используем готовый стек (из structures/stack/)
+ *    - Элементы стека: Range (пара границ left, right)
+ *    - Функции: Stack_Push(), Stack_Pop(), Stack_IsEmpty()
  * 
  * 2. Основной цикл:
  *    while(стек не пуст) {
@@ -26,51 +26,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// ============ ТИП ЭЛЕМЕНТОВ СТЕКА ============
+
 // Структура для хранения границ подмассива
+// Это то, что лежит в стеке
 typedef struct {
-    int left;
-    int right;
+    int left;   // Левая граница
+    int right;  // Правая граница
 } Range;
 
-// Структура стека
-typedef struct {
-    Range* data;
-    int top;
-    int capacity;
-} Stack;
-
-// Создание стека
-Stack* createStack(int capacity) {
-    Stack* stack = (Stack*)malloc(sizeof(Stack));
-    stack->data = (Range*)malloc(capacity * sizeof(Range));
-    stack->top = -1;
-    stack->capacity = capacity;
-    return stack;
-}
-
-// Добавление элемента в стек
-void push(Stack* stack, int left, int right) {
-    if (stack->top < stack->capacity - 1) {
-        stack->top++;
-        stack->data[stack->top].left = left;
-        stack->data[stack->top].right = right;
-    }
-}
-
-// Извлечение элемента из стека
-Range pop(Stack* stack) {
-    Range r = {-1, -1};
-    if (stack->top >= 0) {
-        r = stack->data[stack->top];
-        stack->top--;
-    }
-    return r;
-}
-
-// Проверка пустоты стека
-int isEmpty(Stack* stack) {
-    return stack->top < 0;
-}
+// ============ ИСПОЛЬЗУЕМЫЙ СТЕК ============
+// 
+// Предполагается, что у нас есть готовый стек с функциями:
+// 
+// Stack stack;                           // Наш стек границ
+// Stack_Init(&stack);                    // Инициализация
+// Stack_Push(&stack, range);             // Добавить Range в стек
+// Range range = Stack_Pop(&stack);       // Извлечь Range из стека
+// int empty = Stack_IsEmpty(&stack);     // Проверка пустоты
+// 
+// Стек хранит элементы типа Range
 
 // Обмен элементов
 void swap(int* a, int* b) {
@@ -79,63 +54,90 @@ void swap(int* a, int* b) {
     *b = temp;
 }
 
-// Разделение массива (как в рекурсивной версии)
+// Разделение массива на две части относительно опорного элемента
+// Возвращает позицию разделения
 int partition(int arr[], int left, int right) {
+    // Выбираем опорный элемент (средний элемент диапазона)
     int pivot = arr[(left + right) / 2];
     
-    while (left <= right) {
-        while (arr[left] < pivot) left++;
-        while (arr[right] > pivot) right--;
-        
-        if (left <= right) {
-            swap(&arr[left], &arr[right]);
+    // Пока указатели не встретились
+    while (left < right) {
+        // Двигаем левый указатель вправо, пока элементы меньше опорного
+        while (arr[left] < pivot) {
             left++;
+        }
+        
+        // Двигаем правый указатель влево, пока элементы больше опорного
+        while (arr[right] > pivot) {
             right--;
         }
+        
+        // Если указатели встретились или пересеклись - пропускаем swap
+        if (left >= right) {
+            continue;
+        }
+        
+        // Меняем элементы местами и сдвигаем оба указателя
+        swap(&arr[left], &arr[right]);
+        left++;
+        right--;
     }
     
-    return left;
+    // Возвращаем позицию разделения
+    return right;
 }
 
 // Нерекурсивная быстрая сортировка
-void quickSortNonRecursive(int arr[], int n) {
-    // Создаём стек для хранения границ подмассивов
-    Stack* stack = createStack(n);
+void quickSortNonRecursive(int arr[], int n, Stack* stack) {
+    // Предполагается, что стек уже инициализирован: Stack_Init(&stack)
+    
+    // Создаём начальный диапазон для всего массива
+    Range initial_range;
+    initial_range.left = 0;
+    initial_range.right = n - 1;
     
     // Кладём в стек границы всего массива
-    push(stack, 0, n - 1);
+    Stack_Push(stack, initial_range);
     
     // Пока есть подмассивы для сортировки
-    while (!isEmpty(stack)) {
-        // Берём очередной диапазон
-        Range range = pop(stack);
+    while (!Stack_IsEmpty(stack)) {
+        // Берём очередной диапазон из стека
+        Range range = Stack_Pop(stack);
         int left = range.left;
         int right = range.right;
         
-        // Если диапазон корректный
+        // Если диапазон корректный (больше 1 элемента)
         if (left < right) {
-            // Разделяем массив
-            int pivot = partition(arr, left, right);
+            // Разделяем массив на две части
+            int m = partition(arr, left, right);
             
-            // Добавляем в стек границы получившихся подмассивов
-            if (pivot - 1 > left) {
-                push(stack, left, pivot - 1);
+            // Добавляем в стек границы левой части [left, m]
+            if (m > left) {
+                Range left_range;
+                left_range.left = left;
+                left_range.right = m;
+                Stack_Push(stack, left_range);
             }
-            if (right > pivot) {
-                push(stack, pivot, right);
+            
+            // Добавляем в стек границы правой части [m+1, right]
+            if (right > m) {
+                Range right_range;
+                right_range.left = m + 1;
+                right_range.right = right;
+                Stack_Push(stack, right_range);
             }
         }
     }
     
-    // Освобождаем память
-    free(stack->data);
-    free(stack);
+    // Стек очищается вызывающей стороной
 }
 
 // ============ СЛОЖНОСТЬ ============
 // Время: O(n log n) в среднем, O(n²) в худшем случае
 // Память: O(n) для стека
 // Преимущество перед рекурсией: контроль над использованием памяти
+
+// ============ ПРИМЕР ИСПОЛЬЗОВАНИЯ ============
 
 /*
 int main() {
@@ -145,12 +147,22 @@ int main() {
     printf("До сортировки: ");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
+    printf("\n");
     
-    quickSortNonRecursive(arr, n);
+    // Создаём и инициализируем стек для хранения Range
+    Stack stack;
+    Stack_Init(&stack);
     
-    printf("\nПосле сортировки: ");
+    // Сортируем массив, передавая стек
+    quickSortNonRecursive(arr, n, &stack);
+    
+    printf("После сортировки: ");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
+    printf("\n");
+    
+    // Можно очистить стек если нужно
+    // Stack_Destroy(&stack);
     
     return 0;
 }

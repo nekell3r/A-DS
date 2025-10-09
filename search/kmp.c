@@ -5,18 +5,18 @@
 
 // Построение префикс-функции (таблицы сдвигов)
 void computeLPSArray(char* pattern, int M, int* lps) {
-    int len = 0;  // Длина предыдущего наибольшего префикса-суффикса
+    int j = 0;  // Длина предыдущего наибольшего префикса-суффикса
     lps[0] = 0;   // lps[0] всегда 0
     int i = 1;
     
     while (i < M) {
-        if (pattern[i] == pattern[len]) {
-            len++;
-            lps[i] = len;
+        if (pattern[i] == pattern[j]) {
+            lps[i] = j+1;
+            j++;
             i++;
         } else {
-            if (len != 0) {
-                len = lps[len - 1];
+            if (j != 0) {
+                j = lps[j - 1]; 
             } else {
                 lps[i] = 0;
                 i++;

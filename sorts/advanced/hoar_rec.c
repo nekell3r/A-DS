@@ -11,63 +11,75 @@
  * 
  * КАК ПИСАТЬ:
  * 1. Функция partition():
- *    - Берём опорный элемент
- *    - Два указателя: слева и справа
+ *    - Берём опорный элемент (средний)
+ *    - Два указателя: left и right
  *    - Двигаем указатели навстречу, меняя элементы
  *    - Возвращаем точку разделения
  * 
- * 2. Функция sort():
+ * 2. Функция quickSort():
  *    - Базовый случай: массив из 0-1 элементов
  *    - Разделяем массив через partition()
  *    - Рекурсивно сортируем обе части
  */
 
+#include <stdio.h>
+
 // Обмен двух элементов местами
-void swap(int *n, int *m) {
-    int a = *n;
-    *n = *m;
-    *m = a;
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 // Разделение массива на две части относительно опорного элемента
 // Возвращает позицию разделения
-int part(vectorint* a, int l, int r) {
+int partition(int arr[], int left, int right) {
     // Выбираем опорный элемент (средний элемент диапазона)
-    int el = *vectorint_at(a, (l + r) / 2);
+    int pivot = arr[(left + right) / 2];
     
     // Пока указатели не встретились
-    while (l < r) {
+    while (left < right) {
         // Двигаем левый указатель вправо, пока элементы меньше опорного
-        while (*vectorint_at(a, l) < el) {l++;}
+        while (arr[left] < pivot) {
+            left++;
+        }
         
         // Двигаем правый указатель влево, пока элементы больше опорного
-        while (*vectorint_at(a, r) > el) {r--;}
+        while (arr[right] > pivot) {
+            right--;
+        }
         
-        // Если указатели встретились или пересеклись - выходим
-        if (l >= r) {continue;}
+        // Если указатели встретились или пересеклись - пропускаем swap
+        if (left >= right) {
+            continue;
+        }
         
         // Меняем элементы местами и сдвигаем оба указателя
-        swap(vectorint_at(a, l++), vectorint_at(a, r--));
+        swap(&arr[left], &arr[right]);
+        left++;
+        right--;
     }
     
     // Возвращаем позицию разделения
-    return r;
+    return right;
 }
 
 // Рекурсивная быстрая сортировка Хоара
-// a - вектор для сортировки, l - левая граница, r - правая граница
-void sort(vectorint* a, int l, int r) {
+// arr - массив для сортировки, left - левая граница, right - правая граница
+void quickSort(int arr[], int left, int right) {
     // Базовый случай: если диапазон пустой или из одного элемента
-    if (l >= r) {return;}
+    if (left >= right) {
+        return;
+    }
     
     // Разделяем массив на две части
-    int m = part(a, l, r);
+    int m = partition(arr, left, right);
     
-    // Рекурсивно сортируем левую часть [l, m]
-    sort(a, l, m);
+    // Рекурсивно сортируем левую часть [left, m]
+    quickSort(arr, left, m);
     
-    // Рекурсивно сортируем правую часть [m+1, r]
-    sort(a, m + 1, r);
+    // Рекурсивно сортируем правую часть [m+1, right]
+    quickSort(arr, m + 1, right);
 }
 
 // ============ СЛОЖНОСТЬ ============
@@ -80,31 +92,75 @@ void sort(vectorint* a, int l, int r) {
 #include <stdio.h>
 
 int main() {
-    int arr[] = {5, 2, 9, 1, 7, 6, 3};
-    int n = 7;
+    printf("=== Быстрая сортировка Хоара (рекурсивная) ===\n\n");
     
-    printf("До сортировки: ");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
+    // Тест 1: Обычный массив
+    int arr1[] = {5, 2, 9, 1, 7, 6, 3};
+    int n1 = sizeof(arr1) / sizeof(arr1[0]);
+    
+    printf("Тест 1: Обычный массив\n");
+    printf("До:    ");
+    for (int i = 0; i < n1; i++)
+        printf("%d ", arr1[i]);
     printf("\n");
     
-    // Предполагается vectorint - замените на свою структуру
-    // sort(vector, 0, n - 1);
+    quickSort(arr1, 0, n1 - 1);
     
-    printf("После сортировки: ");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
-    printf("\n");
+    printf("После: ");
+    for (int i = 0; i < n1; i++)
+        printf("%d ", arr1[i]);
+    printf("\n\n");
     
-    // Тест 1: Уже отсортированный
+    // Тест 2: Уже отсортированный
     int arr2[] = {1, 2, 3, 4, 5};
-    printf("Тест 1: 1 2 3 4 5 → ");
-    // sort(vector2, 0, 4);
-    printf("1 2 3 4 5\n");
+    int n2 = sizeof(arr2) / sizeof(arr2[0]);
     
-    // Тест 2: Обратный порядок
+    printf("Тест 2: Уже отсортированный\n");
+    printf("До:    ");
+    for (int i = 0; i < n2; i++)
+        printf("%d ", arr2[i]);
+    printf("\n");
+    
+    quickSort(arr2, 0, n2 - 1);
+    
+    printf("После: ");
+    for (int i = 0; i < n2; i++)
+        printf("%d ", arr2[i]);
+    printf("\n\n");
+    
+    // Тест 3: Обратный порядок
     int arr3[] = {9, 7, 5, 3, 1};
-    printf("Тест 2: 9 7 5 3 1 → ");
-    // sort(vector3, 0, 4);
-    printf("1 3 5 7 9\n");
+    int n3 = sizeof(arr3) / sizeof(arr3[0]);
+    
+    printf("Тест 3: Обратный порядок\n");
+    printf("До:    ");
+    for (int i = 0; i < n3; i++)
+        printf("%d ", arr3[i]);
+    printf("\n");
+    
+    quickSort(arr3, 0, n3 - 1);
+    
+    printf("После: ");
+    for (int i = 0; i < n3; i++)
+        printf("%d ", arr3[i]);
+    printf("\n\n");
+    
+    // Тест 4: Повторяющиеся элементы
+    int arr4[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
+    int n4 = sizeof(arr4) / sizeof(arr4[0]);
+    
+    printf("Тест 4: Повторяющиеся элементы\n");
+    printf("До:    ");
+    for (int i = 0; i < n4; i++)
+        printf("%d ", arr4[i]);
+    printf("\n");
+    
+    quickSort(arr4, 0, n4 - 1);
+    
+    printf("После: ");
+    for (int i = 0; i < n4; i++)
+        printf("%d ", arr4[i]);
+    printf("\n\n");
     
     return 0;
 }
