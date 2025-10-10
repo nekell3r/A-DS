@@ -178,23 +178,14 @@ int TopRightDeque(deque * d){
 
 // удалить дек
 bool DeleteDeque(deque * d){
-    if(isEmptyDeque(d))
-        return false;
-    
-    Item *q;
-    q = d->left->next;
-    free(d->left);
-    d->size--;
-    
-    if(q == 0){
-        d->left = d->right=q;
-        return true;
+    while(!isEmptyDeque(d)){
+        Item *q = d->left->next;
+        free(d->left);
+        d->left = q;
+        d->size--;
     }
-    
-    d->left = q;
-    d->left->prev = 0;
-    
-    return DeleteDeque(d);
+    d->left = d->right = NULL;
+    return true;
 }
 
 // ============ СЛОЖНОСТЬ ============
