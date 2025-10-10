@@ -30,7 +30,7 @@ typedef struct {
 // ШАГ 1: Разделение массива на естественные серии
 // Находит все серии в массиве (уже отсортированные участки)
 int FindSeries(int* arr, int size, Series* series) {
-    int seriesCount = 0;
+    int seriesCount = 0; // порядок серии(n-ая)
     int i = 0;
     
     while (i < size) {
