@@ -6,19 +6,15 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Очередь на динамическом списке (Queue)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
-       QNode* head;  // терминатор (голова)
-       QNode* tail;  // последний элемент (хвост)
+       QNode* head;  // голова
+       QNode* tail;  // терминатор(хвост)
        int size;     // размер очереди
    } QueueDynamic;
-   
    typedef struct QNode {
        T data;              // данные элемента
        struct QNode* next;  // следующий элемент
    } QNode;
-   
    ФУНКЦИИ:
    void QD_Create(QueueDynamic* q)      ∅ → Queue
    bool QD_Empty(const QueueDynamic* q) Queue → boolean

@@ -9,20 +9,16 @@ typedef struct {
 /* ============================================================
    ШПАРГАЛКА: Дек на двусвязном списке (Deque)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        Item* left;   // левый конец дека
        Item* right;  // правый конец дека
        int size;     // размер дека
    } deque;
-   
    typedef struct Item {
        int data;           // данные элемента
        struct Item* next;  // следующий элемент
        struct Item* prev;  // предыдущий элемент
    } Item;
-   
    ФУНКЦИИ:
    deque* CreateDeque(vector* v)         vector → Deque
    bool isEmptyDeque(deque* d)           Deque → boolean

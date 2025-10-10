@@ -6,13 +6,11 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Динамический вектор (Vector)
    ============================================================
-   
    СТРУКТУРА:
    typedef struct {
        T* data;     // массив элементов
        int size;    // размер вектора
-   } Vector;
-   
+   } Vector
    ФУНКЦИИ:
    void Create(Vector* v, int sz)           N → V_T,In
    bool Empty(Vector* v)                    V_T,In → boolean

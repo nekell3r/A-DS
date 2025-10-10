@@ -10,23 +10,18 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Двусвязный список с итераторами (List)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        Item* head;  // терминатор (sentinel)
        int size;    // размер списка
    } List;
-   
    typedef struct Item {
        struct Item* prev;  // предыдущий элемент
        struct Item* next;  // следующий элемент
        T data;             // данные
    } Item;
-   
    typedef struct {
        Item* node;  // указатель на узел
    } Iterator;
-   
    ФУНКЦИИ:
    void Create(List* l)                                ∅ → List
    void Destroy(List* l)                               List → ∅

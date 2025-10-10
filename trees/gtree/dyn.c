@@ -1,15 +1,11 @@
 // Общее дерево (general tree) - представление "первый ребёнок - следующий брат"
 // Структура: каждый узел хранит ссылку на первого ребёнка и на следующего брата
-//
-// ============ КРАТКАЯ СПРАВКА ============
-//
 // СТРУКТУРЫ:
 //   struct node {
 //       int val;            - значение узла
 //       node* main_bro;     - следующий брат (next sibling)
 //       node* first_child;  - первый ребёнок
 //   };
-//
 // ОСНОВНЫЕ ФУНКЦИИ:
 //   void init(node** tree, int root_value)         - инициализировать дерево с корнем
 //   node* create_node(int value)                   - создать узел
@@ -99,7 +95,7 @@ node* next_sibling(node* tree) {
 // Получение узла по пути
 // path - строка из символов 'c' (first_child) и 'b' (main_bro)
 // Пример: "cb" - первый ребёнок, затем его следующий брат
-static node** get_node(node** t, char* path) {
+node** get_node(node** t, char* path) {
     if (path[0] == '\0') {
         return t;
     } else if (path[0] == 'c' && (*t)->first_child != NULL) {

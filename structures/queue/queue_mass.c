@@ -6,14 +6,11 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Очередь на массиве (Queue Array)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        T data[N];   // кольцевой буфер
        int head;    // индекс головы (первого элемента)
        int size;    // количество элементов
    } QueueArray;
-   
    ФУНКЦИИ:
    void QA_Create(QueueArray* q)        ∅ → Queue
    bool QA_Empty(const QueueArray* q)   Queue → boolean

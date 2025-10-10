@@ -8,14 +8,11 @@ const int POOL_SIZE = 100;
 /* ============================================================
    ШПАРГАЛКА: Стек на векторе (Stack on Vector)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        int size;        // текущий размер стека
        int capacity;    // вместимость (capacity)
        Vector data;     // вектор для хранения данных
    } stack;
-   
    ФУНКЦИИ:
    void Stack_Create(stack* s)      ∅ → Stack
    bool Empty(stack* s)             Stack → boolean

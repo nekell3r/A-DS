@@ -6,18 +6,14 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Стек на динамическом списке (Stack)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        struct Item* top;  // вершина стека
        int size;          // размер стека
    } stack;
-   
    struct Item {
        T data;            // данные элемента
        struct Item* prev; // предыдущий элемент
    };
-   
    ФУНКЦИИ:
    void Create(stack* s)           ∅ → Stack
    bool Empty(stack* s)            Stack → boolean

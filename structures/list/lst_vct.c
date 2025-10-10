@@ -10,8 +10,6 @@ typedef void* T;
 /* ============================================================
    ШПАРГАЛКА: Список на векторе с пулом (List on Vector)
    ============================================================
-   
-   СТРУКТУРА:
    typedef struct {
        Item* pool;    // массив элементов (пул)
        int head;      // индекс терминатора
@@ -19,17 +17,14 @@ typedef void* T;
        int size;      // количество элементов
        int capacity;  // размер пула
    } List;
-   
    typedef struct {
        T data;      // данные
        int next;    // индекс следующего (-1 если нет)
        int prev;    // индекс предыдущего (-1 если нет)
    } Item;
-   
    typedef struct {
        int index;   // индекс в массиве
    } Iterator;
-   
    ФУНКЦИИ:
    void Create(List* l)                       ∅ → List
    void Destroy(List* l)                      List → ∅

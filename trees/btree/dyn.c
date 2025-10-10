@@ -1,8 +1,4 @@
 // Бинарное дерево на указателях (динамическое)
-//
-// ============ КРАТКАЯ СПРАВКА ============
-//
-// СТРУКТУРЫ:
 //   struct Tree_Node_ {
 //       int data;
 //       Tree_Node* left;
@@ -11,7 +7,6 @@
 //   struct Tree_ {
 //       Tree_Node* root;
 //   };
-//
 // ОСНОВНЫЕ ФУНКЦИИ:
 //   void init(Tree* tree)                           - инициализировать пустое дерево
 //   Tree* build(Tree* left, int value, Tree* right) - построить из поддеревьев
