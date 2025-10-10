@@ -13,7 +13,7 @@
 //   } Tree;
 //
 // ОСНОВНЫЕ ФУНКЦИИ:
-//   void init(Tree* tree)                          - инициализировать пустое дерево
+//   void init(Tree* tree, size_t capacity)         - инициализировать пустое дерево
 //   Tree* build(Tree* left, int value, Tree* right) - построить из поддеревьев
 //   Tree* build_from_array(int values[], int n)    - построить из массива
 //   bool is_empty(Tree* tree)                      - проверка пустоты
@@ -43,8 +43,8 @@ typedef struct {
 // ============ БАЗОВЫЕ ФУНКЦИИ ============
 
 // Инициализация пустого дерева
-void init(Tree* tree) {
-    tree->capacity = DEFAULT_CAPACITY;
+void init(Tree* tree, size_t capacity) {
+    tree->capacity = capacity;
     tree->data = (int*)malloc(tree->capacity * sizeof(int));
     for (size_t i = 0; i < tree->capacity; i++) {
         tree->data[i] = EMPTY_NODE;
@@ -55,7 +55,7 @@ void init(Tree* tree) {
 // Построение дерева из корня и двух поддеревьев
 Tree* build(Tree* left, int root_value, Tree* right) {
     Tree* tree = (Tree*)malloc(sizeof(Tree));
-    init(tree);
+    init(tree, DEFAULT_CAPACITY);
     tree->data[0] = root_value;
     
     // Копируем всё левое поддерево в позицию 1 (левый ребёнок корня)
@@ -108,7 +108,7 @@ Tree* left(Tree* tree) {
     if (is_empty(tree) || tree->data[1] == EMPTY_NODE) return NULL;
     
     Tree* left_tree = (Tree*)malloc(sizeof(Tree));
-    init(left_tree);
+    init(left_tree, DEFAULT_CAPACITY);
     
     // Копируем ВСЁ левое поддерево с корнем в индексе 1 -> в индекс 0
     copy_subtree(tree->data, tree->capacity, 1,
@@ -122,7 +122,7 @@ Tree* right(Tree* tree) {
     if (is_empty(tree) || tree->data[2] == EMPTY_NODE) return NULL;
     
     Tree* right_tree = (Tree*)malloc(sizeof(Tree));
-    init(right_tree);
+    init(right_tree, DEFAULT_CAPACITY);
     
     // Копируем ВСЁ правое поддерево с корнем в индексе 2 -> в индекс 0
     copy_subtree(tree->data, tree->capacity, 2,
@@ -136,6 +136,18 @@ void destroy(Tree* tree) {
     if (tree == NULL) return;
     free(tree->data);
     free(tree);
+}
+
+// ============ ПОСТРОЕНИЕ ДЕРЕВА ИЗ МАССИВА ============
+
+// Построение дерева из массива
+Tree* build_from_array(int values[], int n) {
+    Tree* tree = (Tree*)malloc(sizeof(Tree));
+    init(tree, DEFAULT_CAPACITY);
+    for (int i = 0; i < n && i < (int)tree->capacity; i++) {
+        tree->data[i] = values[i];
+    }
+    return tree;
 }
 
 // ============ АЛГОРИТМЫ ОБХОДА ============

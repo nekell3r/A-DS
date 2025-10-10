@@ -13,7 +13,7 @@
 //   } Tree;
 //
 // ОСНОВНЫЕ ФУНКЦИИ:
-//   void init(Tree* tree)                          - инициализировать пустое дерево
+//   void init(Tree* tree, size_t capacity)         - инициализировать пустое дерево
 //   Tree* build_from_array(int values[], int n)    - построить из массива значений
 //   Tree* build(Tree* left, int val, Tree* right)  - построить из поддеревьев
 //   bool is_empty(Tree* tree, int idx)             - проверка пустоты узла
@@ -42,8 +42,8 @@ typedef struct {
 // ============ БАЗОВЫЕ ФУНКЦИИ ============
 
 // Инициализация пустого дерева
-void init(Tree* tree) {
-    tree->capacity = DEFAULT_CAPACITY;
+void init(Tree* tree, size_t capacity) {
+    tree->capacity = capacity;
     tree->data = (int*)malloc(tree->capacity * sizeof(int));
     for (size_t i = 0; i < tree->capacity; i++) {
         tree->data[i] = EMPTY_NODE;
@@ -53,7 +53,7 @@ void init(Tree* tree) {
 // Построение дерева из массива значений
 Tree* build_from_array(int values[], int n) {
     Tree* tree = (Tree*)malloc(sizeof(Tree));
-    init(tree);
+    init(tree, DEFAULT_CAPACITY);
     
     for (int i = 0; i < n && i < (int)tree->capacity; i++) {
         tree->data[i] = values[i];
@@ -91,7 +91,7 @@ int map_index(int src_idx, int dst_idx) {
 // Построение дерева из корня и двух поддеревьев
 Tree* build(Tree* left, int root_value, Tree* right) {
     Tree* tree = (Tree*)malloc(sizeof(Tree));
-    init(tree);
+    init(tree, DEFAULT_CAPACITY);
     
     // Устанавливаем корень
     tree->data[0] = root_value;

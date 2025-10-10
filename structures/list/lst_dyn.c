@@ -138,7 +138,7 @@ void Destroy(List* l) {
         free(pi);
     }
     free(l->head);
-    l->head = 0
+    l->head = 0;
     l->size = 0;
 }
 
